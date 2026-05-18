@@ -43,8 +43,13 @@
               <p class="muted">{{ task.status }}{% if task.task_time %} • {{ task.task_time }}{% endif %}</p>
             </div>
             <form method="post" action="/dashboard/tasks/{{ task.id }}/toggle">
-              <button class="tiny-btn {{ 'done-btn' if task.status == 'выполнено' else '' }}" type="submit">
-                {{ "Снять" if task.status == "выполнено" else "Выполнено" }}
+              <button
+                class="completion-toggle {{ 'completed' if task.status == 'выполнено' else '' }}"
+                type="submit"
+                aria-label="{{ 'Снять выполнение задачи' if task.status == 'выполнено' else 'Отметить задачу выполненной' }}"
+                title="{{ 'Снять выполнение' if task.status == 'выполнено' else 'Отметить выполненной' }}"
+              >
+                <span>✓</span>
               </button>
             </form>
           </li>
@@ -106,8 +111,13 @@
             {% else %}
               <form method="post" action="/dashboard/habits/{{ item.habit.id }}/status">
                 <input type="hidden" name="completed" value="{{ 'false' if item.log and item.log.completed else 'true' }}" />
-                <button class="tiny-btn {{ 'done-btn' if item.log and item.log.completed else '' }}" type="submit">
-                  {{ "Снять" if item.log and item.log.completed else "Отметить" }}
+                <button
+                  class="completion-toggle {{ 'completed' if item.log and item.log.completed else '' }}"
+                  type="submit"
+                  aria-label="{{ 'Снять выполнение привычки' if item.log and item.log.completed else 'Отметить привычку выполненной' }}"
+                  title="{{ 'Снять выполнение' if item.log and item.log.completed else 'Отметить выполненной' }}"
+                >
+                  <span>✓</span>
                 </button>
               </form>
             {% endif %}
@@ -204,8 +214,13 @@
               <p class="muted">{{ task.status }}</p>
             </div>
             <form method="post" action="/dashboard/tasks/{{ task.id }}/toggle">
-              <button class="tiny-btn {{ 'done-btn' if task.status == 'выполнено' else '' }}" type="submit">
-                {{ "Снять" if task.status == "выполнено" else "Готово" }}
+              <button
+                class="completion-toggle {{ 'completed' if task.status == 'выполнено' else '' }}"
+                type="submit"
+                aria-label="{{ 'Снять выполнение задачи' if task.status == 'выполнено' else 'Отметить задачу выполненной' }}"
+                title="{{ 'Снять выполнение' if task.status == 'выполнено' else 'Отметить выполненной' }}"
+              >
+                <span>✓</span>
               </button>
             </form>
           </li>
@@ -243,8 +258,13 @@
             {% else %}
               <form method="post" action="/dashboard/habits/{{ item.habit.id }}/status">
                 <input type="hidden" name="completed" value="{{ 'false' if item.log and item.log.completed else 'true' }}" />
-                <button class="tiny-btn {{ 'done-btn' if item.log and item.log.completed else '' }}" type="submit">
-                  {{ "Снять" if item.log and item.log.completed else "Отметить" }}
+                <button
+                  class="completion-toggle {{ 'completed' if item.log and item.log.completed else '' }}"
+                  type="submit"
+                  aria-label="{{ 'Снять выполнение привычки' if item.log and item.log.completed else 'Отметить привычку выполненной' }}"
+                  title="{{ 'Снять выполнение' if item.log and item.log.completed else 'Отметить выполненной' }}"
+                >
+                  <span>✓</span>
                 </button>
               </form>
             {% endif %}
