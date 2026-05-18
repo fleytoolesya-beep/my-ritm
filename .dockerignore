@@ -1,0 +1,11 @@
+.git
+.gitignore
+.venv
+__pycache__
+*.pyc
+planner.db
+planner_app/.env
+planner_app/planner.db
+planner_app/venv
+planner_app/__pycache__
+planner_app/app/__pycache__
