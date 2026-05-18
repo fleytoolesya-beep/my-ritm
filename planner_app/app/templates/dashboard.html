@@ -89,7 +89,6 @@
             {% if item.habit.habit_type == "numeric" %}
             <div>
               <strong>{{ item.habit.title }}</strong>
-              <p class="muted">{{ item.frequency_label }}</p>
               <p class="muted">
                 {% if item.log and item.log.numeric_value is not none %}
                   {{ item.log.numeric_value }} / {{ item.habit.target_value or "—" }} {{ item.habit.unit or "" }}
