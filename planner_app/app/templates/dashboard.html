@@ -286,5 +286,11 @@
       {% endif %}
     </article>
   </section>
+
+  {% if get_current_user(request) %}
+  <section class="mobile-dashboard-logout">
+    <a class="mobile-logout-link" href="/logout">Выйти</a>
+  </section>
+  {% endif %}
 </section>
 {% endblock %}

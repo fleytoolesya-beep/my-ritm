@@ -33,15 +33,6 @@
         {% endif %}
       </aside>
       <main class="content">
-        {% if current_user %}
-        <section class="mobile-account-bar">
-          <div class="mobile-account-text">
-            <span class="eyebrow">аккаунт</span>
-            <strong>{{ current_user.email }}</strong>
-          </div>
-          <a class="btn secondary mobile-logout-btn" href="/logout">Выйти</a>
-        </section>
-        {% endif %}
         {% block content %}{% endblock %}
       </main>
     </div>
