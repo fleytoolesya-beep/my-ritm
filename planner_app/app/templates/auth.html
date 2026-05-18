@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ "Вход" if mode == "login" else "Регистрация" }} • Мой ритм</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body class="auth-body">
+    <main class="auth-shell">
+      <section class="auth-card">
+        <div class="brand auth-brand">
+          <div class="brand-mark">LP</div>
+          <div>
+            <p class="eyebrow">личный планер</p>
+            <h1>Мой ритм</h1>
+          </div>
+        </div>
+
+        <div class="auth-tabs">
+          <a class="{{ 'active' if mode == 'login' else '' }}" href="/login">Вход</a>
+          <a class="{{ 'active' if mode == 'register' else '' }}" href="/register">Регистрация</a>
+        </div>
+
+        <div class="auth-copy">
+          <h2>{{ "Войти в аккаунт" if mode == "login" else "Создать аккаунт" }}</h2>
+          <p class="muted">
+            {{ "Войди, чтобы пользоваться приложением с разных устройств." if mode == "login" else "Создай личный аккаунт, чтобы сохранить данные и синхронизировать их между телефоном и компьютером." }}
+          </p>
+        </div>
+
+        {% if error %}
+        <div class="auth-message error">{{ error }}</div>
+        {% endif %}
+        {% if message %}
+        <div class="auth-message success">{{ message }}</div>
+        {% endif %}
+
+        {% if mode == "login" %}
+        <form class="auth-form" method="post" action="/login">
+          <label>Email
+            <input type="email" name="email" required />
+          </label>
+          <label>Пароль
+            <input type="password" name="password" required />
+          </label>
+          <button class="btn" type="submit">Войти</button>
+        </form>
+        {% else %}
+        <form class="auth-form" method="post" action="/register">
+          <label>Email
+            <input type="email" name="email" required />
+          </label>
+          <label>Пароль
+            <input type="password" name="password" required minlength="6" />
+          </label>
+          <label>Повтори пароль
+            <input type="password" name="password_repeat" required minlength="6" />
+          </label>
+          <button class="btn" type="submit">Создать аккаунт</button>
+        </form>
+        {% endif %}
+      </section>
+    </main>
+  </body>
+  </html>

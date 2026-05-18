@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section-head">
+  <div>
+    <p class="eyebrow">цель</p>
+    <h2>{{ "Редактировать цель" if goal else "Новая цель" }}</h2>
+  </div>
+</section>
+
+<form class="card form-card" method="post" action="{{ '/goals/' ~ goal.id ~ '/edit' if goal else '/goals' }}">
+  <div class="soft-box form-intro">
+    <strong>{{ "Подстрой цель под текущий ритм" if goal else "Сформулируй цель так, чтобы к ней хотелось возвращаться" }}</strong>
+    <p class="muted">Лучше короткое понятное название и несколько шагов, чем слишком большая абстрактная цель.</p>
+  </div>
+  <label>Название
+    <input type="text" name="title" value="{{ goal.title if goal else '' }}" required />
+  </label>
+  <div class="form-grid">
+    <label>Категория
+      <select name="category">
+        {% for option in goal_categories %}
+        <option value="{{ option }}" {% if goal and option == goal.category %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Тип цели
+      <select name="goal_type">
+        {% for option in goal_types %}
+        <option value="{{ option }}" {% if goal and option == goal.goal_type %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+  <label>Дедлайн
+    <input type="date" name="due_date" value="{{ goal.due_date.isoformat() if goal and goal.due_date else default_date }}" />
+  </label>
+  <label>Заметка
+    <textarea name="notes" rows="4">{{ goal.notes if goal and goal.notes else '' }}</textarea>
+  </label>
+  <label>{{ "Новые шаги" if goal else "Шаги" }}
+    <textarea name="{{ 'new_steps' if goal else 'step_titles' }}" rows="5" placeholder="Каждый шаг с новой строки"></textarea>
+  </label>
+  {% if steps %}
+  <div class="soft-box">
+    <strong>Текущие шаги</strong>
+    <ul class="sub-list compact">
+      {% for step in steps %}
+      <li><span class="{{ 'done' if step.completed else '' }}">{{ step.title }}</span></li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+  <div class="row-end">
+    <a class="btn secondary" href="/goals">Отмена</a>
+    <button class="btn" type="submit">Сохранить</button>
+  </div>
+</form>
+{% endblock %}

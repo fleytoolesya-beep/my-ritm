@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section-head">
+  <div>
+    <p class="eyebrow">задача</p>
+    <h2>{{ "Редактировать задачу" if task else "Новая задача" }}</h2>
+  </div>
+</section>
+
+<form class="card form-card" method="post" action="{{ '/tasks/' ~ task.id ~ '/edit' if task else '/tasks' }}">
+  <div class="soft-box form-intro">
+    <strong>{{ "Измени задачу под текущий день" if task else "Создай задачу спокойно и без спешки" }}</strong>
+    <p class="muted">Дату и время можно поменять позже. Подзадачи добавляй по одной с новой строки.</p>
+  </div>
+  <label>Название
+    <input type="text" name="title" value="{{ task.title if task else '' }}" required />
+  </label>
+  <div class="form-grid">
+    <label>Дата
+      <input type="date" name="task_date" value="{{ task.task_date.isoformat() if task else default_date }}" required />
+    </label>
+    <label>Время
+      <input type="time" name="task_time" value="{{ task.task_time if task and task.task_time else '' }}" />
+    </label>
+  </div>
+  <label>Статус
+    <select name="status">
+      {% for option in status_options %}
+      <option value="{{ option }}" {% if task and option == task.status %}selected{% endif %}>{{ option }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Заметка
+    <textarea name="notes" rows="4">{{ task.notes if task and task.notes else '' }}</textarea>
+  </label>
+  <label>{{ "Новые подзадачи" if task else "Подзадачи" }}
+    <textarea name="{{ 'new_subtasks' if task else 'subtask_titles' }}" rows="5" placeholder="Каждая подзадача с новой строки"></textarea>
+  </label>
+  {% if subtasks %}
+  <div class="soft-box">
+    <strong>Текущие подзадачи</strong>
+    <ul class="sub-list compact">
+      {% for subtask in subtasks %}
+      <li><span class="{{ 'done' if subtask.completed else '' }}">{{ subtask.title }}</span></li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+  <div class="row-end">
+    <a class="btn secondary" href="/tasks">Отмена</a>
+    <button class="btn" type="submit">Сохранить</button>
+  </div>
+</form>
+{% endblock %}

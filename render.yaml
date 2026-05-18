@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: my-ritm
+    runtime: python
+    rootDir: planner_app
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /login
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: APP_SESSION_SECRET
+        sync: false

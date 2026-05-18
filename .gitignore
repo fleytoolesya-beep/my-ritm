@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+planner_app/.env
+planner.db
+planner_app/planner.db

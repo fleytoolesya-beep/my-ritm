@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section-head">
+  <div>
+    <p class="eyebrow">цели</p>
+    <h2>Мои цели</h2>
+  </div>
+  <a class="btn" href="/goals/new">Новая цель</a>
+</section>
+
+<section class="list-grid">
+  {% for goal in goals %}
+  <article class="card">
+    <div class="card-head goal-card-head">
+      <div>
+        <h3>{{ goal.title }}</h3>
+        <p class="muted">{{ goal.category }} • {{ goal.goal_type }}{% if goal.due_date %} • до {{ goal.due_date.strftime("%d.%m.%Y") }}{% endif %}</p>
+      </div>
+      <div class="goal-head-side">
+        {% if goal.due_date %}
+        <span class="goal-date-top">до {{ goal.due_date.strftime("%d.%m.%Y") }}</span>
+        {% endif %}
+        <span class="goal-status-pill {{ 'goal-done' if goal.completed else 'goal-open' }}">
+          {{ "выполнено" if goal.completed else "не выполнено" }}
+        </span>
+      </div>
+    </div>
+    {% if goal.notes %}<p>{{ goal.notes }}</p>{% endif %}
+    <div class="goal-meta-row">
+      <span class="goal-meta-chip">{{ goal.category }}</span>
+      <span class="goal-meta-chip">{{ goal.goal_type }}</span>
+      <span class="goal-meta-chip">Прогресс: {{ progress_by_goal.get(goal.id, 0) }}%</span>
+    </div>
+    <div class="progress-bar subtle"><div style="width: {{ progress_by_goal.get(goal.id, 0) }}%"></div></div>
+
+    {% set steps = steps_by_goal.get(goal.id, []) %}
+    {% if steps %}
+      <div class="subtasks-title-row">
+        <strong>Шаги</strong>
+      </div>
+      <ul class="sub-list">
+      {% for step in steps %}
+        <li>
+          <form method="post" action="/goal-steps/{{ step.id }}/toggle">
+            <button class="icon-btn" type="submit">{{ "✓" if step.completed else "○" }}</button>
+          </form>
+          <span class="{{ 'done' if step.completed else '' }}">{{ step.title }}</span>
+          <form method="post" action="/goal-steps/{{ step.id }}/delete">
+            <button class="icon-btn danger" type="submit">×</button>
+          </form>
+        </li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+    <div class="row-end goal-actions-row">
+      <form method="post" action="/goals/{{ goal.id }}/toggle">
+        <button class="btn secondary compact-btn" type="submit">{{ "Снять выполнение" if goal.completed else "Выполнено" }}</button>
+      </form>
+      <a class="btn secondary compact-btn" href="/goals/{{ goal.id }}/edit">Редактировать</a>
+      <form method="post" action="/goals/{{ goal.id }}/delete" onsubmit="return confirm('Удалить цель?')">
+        <button class="btn danger compact-btn" type="submit">Удалить</button>
+      </form>
+    </div>
+  </article>
+  {% else %}
+  <article class="card"><p class="muted">Целей пока нет. Можно начать даже с одной короткой.</p></article>
+  {% endfor %}
+</section>
+{% endblock %}

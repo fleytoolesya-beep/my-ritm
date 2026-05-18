@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section-head">
+  <div>
+    <p class="eyebrow">задачи</p>
+    <h2>Все задачи</h2>
+  </div>
+  <a class="btn" href="/tasks/new">Новая задача</a>
+</section>
+
+<section class="list-grid">
+  {% for task in tasks %}
+  <article class="card">
+    <div class="card-head task-card-head">
+      <div>
+        <h3>{{ task.title }}</h3>
+      </div>
+      <div class="task-head-side">
+        <span class="task-date-top">{{ task.task_date.strftime("%d.%m.%Y") }}{% if task.task_time %} • {{ task.task_time }}{% endif %}</span>
+        <span class="task-status-pill status-{{ task.status|replace(' ', '-') }}">{{ task.status }}</span>
+      </div>
+    </div>
+    {% if task.notes %}<p>{{ task.notes }}</p>{% endif %}
+
+    {% set subtasks = subtasks_by_task.get(task.id, []) %}
+    <div class="task-meta-row">
+      <span class="task-meta-chip">{{ task.task_date.strftime("%d.%m") }}</span>
+      {% if task.task_time %}
+      <span class="task-meta-chip">{{ task.task_time }}</span>
+      {% endif %}
+      {% if subtasks %}
+      <span class="task-meta-chip">{{ subtasks|selectattr('completed')|list|length }} / {{ subtasks|length }} подзадач</span>
+      {% endif %}
+    </div>
+    {% if subtasks %}
+      <div class="subtasks-title-row">
+        <strong>Подзадачи</strong>
+      </div>
+      <ul class="sub-list">
+      {% for subtask in subtasks %}
+        <li>
+          <form method="post" action="/subtasks/{{ subtask.id }}/toggle">
+            <button class="icon-btn" type="submit">{{ "✓" if subtask.completed else "○" }}</button>
+          </form>
+          <span class="{{ 'done' if subtask.completed else '' }}">{{ subtask.title }}</span>
+          <form method="post" action="/subtasks/{{ subtask.id }}/delete">
+            <button class="icon-btn danger" type="submit">×</button>
+          </form>
+        </li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+
+    <div class="actions-wrap">
+      <form method="post" action="/tasks/{{ task.id }}/status" class="inline-form">
+        <select name="status">
+          {% for option in status_options %}
+            <option value="{{ option }}" {% if option == task.status %}selected{% endif %}>{{ option }}</option>
+          {% endfor %}
+        </select>
+        <button class="btn secondary compact-btn" type="submit">Сохранить</button>
+      </form>
+      <div class="row-end task-actions-row">
+        <a class="btn secondary compact-btn" href="/tasks/{{ task.id }}/edit">Редактировать</a>
+        <form method="post" action="/tasks/{{ task.id }}/delete" onsubmit="return confirm('Удалить задачу?')">
+          <button class="btn danger compact-btn" type="submit">Удалить</button>
+        </form>
+      </div>
+    </div>
+  </article>
+  {% else %}
+  <article class="card">
+    <p class="muted">Задач пока нет. Начни с первой, чтобы появилась основа дня.</p>
+  </article>
+  {% endfor %}
+</section>
+{% endblock %}

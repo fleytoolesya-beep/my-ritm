@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="desktop-dashboard">
+  <section class="hero">
+    <div>
+      <p class="eyebrow">сегодня</p>
+      <h2>{{ today.strftime("%d.%m.%Y") }}</h2>
+      <p class="muted">Спокойный обзор дня, чтобы было понятно, на чем держать фокус.</p>
+    </div>
+    <div class="progress-card">
+      <span>Выполнение плана</span>
+      <strong>{{ progress }}%</strong>
+      <div class="progress-bar"><div style="width: {{ progress }}%"></div></div>
+    </div>
+  </section>
+
+  <section class="grid two-col">
+    <article class="card accent">
+      <div class="card-head">
+        <h3>Фокус дня</h3>
+        <a class="link" href="/tasks">все задачи</a>
+      </div>
+      {% if focus_task %}
+        <strong>{{ focus_task.title }}</strong>
+        <p class="muted">Главный ориентир на сегодня. Когда закроешь его, день будет ощущаться собраннее.</p>
+        <p class="status-pill restday">{{ focus_task.status }}</p>
+      {% else %}
+        <p class="muted">Все задачи на сегодня уже выполнены или пока не добавлены.</p>
+      {% endif %}
+    </article>
+
+    <article class="card">
+      <div class="card-head">
+        <h3>План на сегодня</h3>
+        <a class="link" href="/tasks/new">+ задача</a>
+      </div>
+      {% if tasks_today %}
+        <ul class="check-list">
+          {% for task in tasks_today %}
+          <li>
+            <div>
+              <strong>{{ task.title }}</strong>
+              <p class="muted">{{ task.status }}{% if task.task_time %} • {{ task.task_time }}{% endif %}</p>
+            </div>
+            <form method="post" action="/dashboard/tasks/{{ task.id }}/toggle">
+              <button class="tiny-btn {{ 'done-btn' if task.status == 'выполнено' else '' }}" type="submit">
+                {{ "Снять" if task.status == "выполнено" else "Выполнено" }}
+              </button>
+            </form>
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted">На сегодня задач пока нет.</p>
+      {% endif %}
+    </article>
+
+    <article class="card">
+      <div class="card-head">
+        <h3>Статус дня</h3>
+        <a class="link" href="/calendar">к календарю</a>
+      </div>
+      <p class="status-pill {{ 'workday' if is_workday else 'restday' }}">
+        {{ "Рабочий день" if is_workday else "Выходной день" }}
+      </p>
+      <p class="muted">Рабочие дни отмечаются цветом в календаре и не мешают обычному планированию.</p>
+    </article>
+  </section>
+
+  <section class="grid two-col">
+    <article class="card">
+      <div class="card-head">
+        <h3>Привычки на сегодня</h3>
+        <a class="link" href="/habits">открыть раздел</a>
+      </div>
+      {% if habits_today %}
+        <ul class="check-list">
+        {% for item in habits_today %}
+          <li>
+            <div>
+              <strong>{{ item.habit.title }}</strong>
+              <p class="muted">{{ item.frequency_label }}</p>
+              {% if item.habit.habit_type == "numeric" %}
+                <p class="muted">
+                  {% if item.log and item.log.numeric_value is not none %}
+                    {{ item.log.numeric_value }} / {{ item.habit.target_value or "—" }} {{ item.habit.unit or "" }}
+                  {% else %}
+                    0 / {{ item.habit.target_value or "—" }} {{ item.habit.unit or "" }}
+                  {% endif %}
+                </p>
+              {% else %}
+                <p class="muted">{{ "сделано" if item.log and item.log.completed else "не сделано" }}</p>
+              {% endif %}
+            </div>
+            {% if item.habit.habit_type == "numeric" %}
+              <div class="dashboard-habit-actions">
+                <form method="post" action="/dashboard/habits/{{ item.habit.id }}/increment">
+                  <input type="hidden" name="delta" value="-1" />
+                  <button class="icon-btn" type="submit">−</button>
+                </form>
+                <form method="post" action="/dashboard/habits/{{ item.habit.id }}/increment">
+                  <input type="hidden" name="delta" value="1" />
+                  <button class="tiny-btn" type="submit">+1</button>
+                </form>
+              </div>
+            {% else %}
+              <form method="post" action="/dashboard/habits/{{ item.habit.id }}/status">
+                <input type="hidden" name="completed" value="{{ 'false' if item.log and item.log.completed else 'true' }}" />
+                <button class="tiny-btn {{ 'done-btn' if item.log and item.log.completed else '' }}" type="submit">
+                  {{ "Сделано" if not item.log or not item.log.completed else "Не сделано" }}
+                </button>
+              </form>
+            {% endif %}
+          </li>
+        {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted">Привычки еще не добавлены.</p>
+      {% endif %}
+    </article>
+
+    <article class="card">
+      <div class="card-head">
+        <h3>Фокус и прогресс</h3>
+        <a class="link" href="/goals">мои цели</a>
+      </div>
+      {% if goal_summaries %}
+        <ul class="stack">
+        {% for item in goal_summaries %}
+          <li class="soft-row">
+            <div>
+              <strong>{{ item.goal.title }}</strong>
+              <p class="muted">{{ item.goal.category }} • {{ item.goal.goal_type }}</p>
+              <p class="muted">
+                {% if item.total_steps %}
+                  {{ item.completed_steps }} / {{ item.total_steps }} шагов
+                {% else %}
+                  Шаги пока не добавлены
+                {% endif %}
+              </p>
+            </div>
+            <span class="tiny-pill">{{ item.progress }}%</span>
+          </li>
+        {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted">Цели пока не созданы.</p>
+      {% endif %}
+      {% if last_measurement %}
+        <div class="divider"></div>
+        <p><strong>Последний вес:</strong> {{ last_measurement.weight or "—" }} кг</p>
+        <p class="muted">Раздел с параметрами спрятан отдельно, чтобы главная не перегружалась.</p>
+      {% endif %}
+    </article>
+
+    <article class="card">
+      <div class="card-head">
+        <h3>Мини-аналитика</h3>
+        <a class="link" href="/measurements">подробнее</a>
+      </div>
+      <ul class="stack">
+        <li class="soft-row"><span>Задачи за 7 дней</span><strong>{{ tasks_week_completed }} / {{ tasks_week_total }}</strong></li>
+        <li class="soft-row"><span>Отметок привычек за 7 дней</span><strong>{{ habits_week_completed }}</strong></li>
+        <li class="soft-row"><span>Рабочих дней в этом месяце</span><strong>{{ workdays_this_month }}</strong></li>
+        <li class="soft-row"><span>Изменение веса за месяц</span><strong>{{ weight_change if weight_change is not none else "—" }}</strong></li>
+      </ul>
+    </article>
+  </section>
+</section>
+
+<section class="mobile-dashboard">
+  <section class="mobile-top-grid">
+    <article class="card mobile-progress-card">
+      <p class="eyebrow">выполнение плана</p>
+      <strong>{{ progress }}%</strong>
+      <div class="progress-bar"><div style="width: {{ progress }}%"></div></div>
+    </article>
+    <div class="mobile-top-stack">
+      <article class="card mobile-mini-card">
+        <p class="eyebrow">дата</p>
+        <strong class="mobile-mini-title">{{ today.strftime("%d.%m.%Y") }}</strong>
+      </article>
+      <article class="card mobile-mini-card">
+        <p class="eyebrow">статус дня</p>
+        <p class="status-pill {{ 'workday' if is_workday else 'restday' }}">
+          {{ "Рабочий день" if is_workday else "Выходной день" }}
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="mobile-main-grid">
+    <article class="card mobile-tasks-card">
+      <div class="card-head mobile-card-head">
+        <h3>Задачи на день</h3>
+        <a class="link" href="/tasks">все</a>
+      </div>
+      {% if tasks_today %}
+        <ul class="mobile-list">
+          {% for task in tasks_today[:4] %}
+          <li class="mobile-list-item">
+            <div>
+              <strong>{{ task.title }}</strong>
+              <p class="muted">{{ task.status }}</p>
+            </div>
+            <form method="post" action="/dashboard/tasks/{{ task.id }}/toggle">
+              <button class="tiny-btn {{ 'done-btn' if task.status == 'выполнено' else '' }}" type="submit">
+                {{ "Снять" if task.status == "выполнено" else "Готово" }}
+              </button>
+            </form>
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted">Задач на сегодня пока нет.</p>
+      {% endif %}
+    </article>
+
+    <article class="card mobile-habits-card">
+      <div class="card-head mobile-card-head">
+        <h3>Привычки</h3>
+        <a class="link" href="/habits">все</a>
+      </div>
+      {% if habits_today %}
+        <ul class="mobile-habit-list">
+        {% for item in habits_today[:3] %}
+          <li class="mobile-habit-item">
+            <strong>{{ item.habit.title }}</strong>
+            {% if item.habit.habit_type == "numeric" %}
+              <p class="muted mobile-habit-value">
+                {{ item.log.numeric_value if item.log and item.log.numeric_value is not none else 0 }} / {{ item.habit.target_value or "—" }}
+              </p>
+              <div class="dashboard-habit-actions compact-actions">
+                <form method="post" action="/dashboard/habits/{{ item.habit.id }}/increment">
+                  <input type="hidden" name="delta" value="-1" />
+                  <button class="icon-btn" type="submit">−</button>
+                </form>
+                <form method="post" action="/dashboard/habits/{{ item.habit.id }}/increment">
+                  <input type="hidden" name="delta" value="1" />
+                  <button class="tiny-btn" type="submit">+1</button>
+                </form>
+              </div>
+            {% else %}
+              <form method="post" action="/dashboard/habits/{{ item.habit.id }}/status">
+                <input type="hidden" name="completed" value="{{ 'false' if item.log and item.log.completed else 'true' }}" />
+                <button class="tiny-btn {{ 'done-btn' if item.log and item.log.completed else '' }}" type="submit">
+                  {{ "Сделано" if not item.log or not item.log.completed else "Не сделано" }}
+                </button>
+              </form>
+            {% endif %}
+          </li>
+        {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted">Привычек пока нет.</p>
+      {% endif %}
+    </article>
+  </section>
+
+  <section class="mobile-bottom-grid">
+    <article class="card mobile-goals-card">
+      <div class="card-head mobile-card-head">
+        <h3>Цели</h3>
+        <a class="link" href="/goals">все</a>
+      </div>
+      {% if goal_summaries %}
+        <ul class="mobile-goal-list">
+          {% for item in goal_summaries[:3] %}
+          <li class="soft-row mobile-goal-item">
+            <div>
+              <strong>{{ item.goal.title }}</strong>
+              <p class="muted">
+                {% if item.total_steps %}
+                  {{ item.completed_steps }} / {{ item.total_steps }} шагов
+                {% else %}
+                  Шагов пока нет
+                {% endif %}
+              </p>
+            </div>
+            <span class="tiny-pill">{{ item.progress }}%</span>
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted">Целей пока нет.</p>
+      {% endif %}
+    </article>
+  </section>
+</section>
+{% endblock %}

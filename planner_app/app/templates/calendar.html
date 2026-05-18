@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section-head">
+  <div>
+    <p class="eyebrow">календарь</p>
+    <h2>{{ title }}</h2>
+  </div>
+  <div class="actions-row">
+    <a class="btn secondary" href="/calendar">Сегодня</a>
+    <a class="btn secondary" href="/calendar?year={{ prev_year }}&month={{ prev_month }}">←</a>
+    <a class="btn secondary" href="/calendar?year={{ next_year }}&month={{ next_month }}">→</a>
+  </div>
+</section>
+
+<section class="card">
+  <div class="calendar-legend">
+    <span><i class="legend-dot work"></i> рабочий день</span>
+    <span><i class="legend-dot task"></i> задачи</span>
+    <span><i class="legend-dot habit"></i> привычки</span>
+    <span class="muted">Нажми на день, чтобы открыть его. Кружок в углу переключает рабочий день.</span>
+  </div>
+  <div class="calendar-grid calendar-head">
+    <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+  </div>
+  {% for week in weeks %}
+    <div class="calendar-grid">
+      {% for day in week %}
+        {% if day %}
+        <div class="calendar-day-wrap">
+          <a class="calendar-day-link" href="/day/{{ day.date.isoformat() }}" aria-label="Открыть день"></a>
+          <form
+            method="post"
+            action="{{ '/workdays/delete' if day.is_workday else '/workdays' }}"
+            class="calendar-day-form"
+          >
+            <input type="hidden" name="day" value="{{ day.date.isoformat() }}" />
+            <button
+              class="calendar-toggle {{ 'active' if day.is_workday else '' }}"
+              type="submit"
+              aria-label="{{ 'Убрать рабочий день' if day.is_workday else 'Отметить рабочим днем' }}"
+              title="{{ 'Снять отметку рабочего дня' if day.is_workday else 'Отметить рабочим днем' }}"
+            >
+              {{ "●" if day.is_workday else "○" }}
+            </button>
+          </form>
+          <div class="calendar-day {{ 'today' if day.is_today else '' }} {{ 'workday' if day.is_workday else '' }}">
+            <div class="calendar-top">
+              <strong class="calendar-number">{{ day.day_num }}</strong>
+            </div>
+            <div class="calendar-markers">
+              {% if day.task_count %}
+                <span class="calendar-chip task">
+                  <i></i>{{ day.task_count }}
+                </span>
+              {% endif %}
+              {% if day.habit_count %}
+                <span class="calendar-chip habit">
+                  <i></i>{{ day.habit_count }}
+                </span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="calendar-day empty"></div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endfor %}
+</section>
+{% endblock %}

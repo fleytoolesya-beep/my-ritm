@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section-head">
+  <div>
+    <p class="eyebrow">вес и параметры</p>
+    <h2>Отслеживание тела</h2>
+  </div>
+  <a class="btn" href="/measurements/new">Новая запись</a>
+</section>
+
+{% if latest %}
+<section class="grid two-col">
+  <article class="card measurement-summary-card">
+    <div class="card-head measurement-card-head">
+      <h3>Последняя запись</h3>
+      <span class="measurement-date-pill">{{ latest.entry_date.strftime("%d.%m.%Y") }}</span>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric-highlight"><span>Вес</span><strong>{{ latest.weight or "—" }}</strong></div>
+      <div><span>Талия</span><strong>{{ latest.waist or "—" }}</strong></div>
+      <div><span>Грудь</span><strong>{{ latest.chest or "—" }}</strong></div>
+      <div><span>Бедра</span><strong>{{ latest.hips or "—" }}</strong></div>
+      <div><span>Ягодицы</span><strong>{{ latest.glutes or "—" }}</strong></div>
+      <div><span>Ноги</span><strong>{{ latest.legs or "—" }}</strong></div>
+    </div>
+  </article>
+
+  <article class="card measurement-summary-card">
+    <div class="card-head measurement-card-head">
+      <h3>Изменение к прошлой записи</h3>
+    </div>
+    {% if previous %}
+      <ul class="stack">
+        <li class="soft-row"><span>Вес</span><strong>{{ format_delta((latest.weight or 0) - (previous.weight or 0)) }}</strong></li>
+        <li class="soft-row"><span>Талия</span><strong>{{ format_delta((latest.waist or 0) - (previous.waist or 0)) }}</strong></li>
+        <li class="soft-row"><span>Бедра</span><strong>{{ format_delta((latest.hips or 0) - (previous.hips or 0)) }}</strong></li>
+      </ul>
+    {% else %}
+      <p class="muted">Появится после второй записи.</p>
+    {% endif %}
+  </article>
+</section>
+
+{% if latest and earliest and latest.id != earliest.id %}
+<section class="grid">
+  <article class="card measurement-summary-card">
+    <div class="card-head measurement-card-head">
+      <h3>Итоговое изменение</h3>
+      <span class="measurement-date-pill">{{ earliest.entry_date.strftime("%d.%m.%Y") }} → {{ latest.entry_date.strftime("%d.%m.%Y") }}</span>
+    </div>
+    <ul class="stack">
+      <li class="soft-row"><span>Вес</span><strong>{{ format_delta((latest.weight or 0) - (earliest.weight or 0)) }}</strong></li>
+      <li class="soft-row"><span>Талия</span><strong>{{ format_delta((latest.waist or 0) - (earliest.waist or 0)) }}</strong></li>
+      <li class="soft-row"><span>Грудь</span><strong>{{ format_delta((latest.chest or 0) - (earliest.chest or 0)) }}</strong></li>
+      <li class="soft-row"><span>Бедра</span><strong>{{ format_delta((latest.hips or 0) - (earliest.hips or 0)) }}</strong></li>
+      <li class="soft-row"><span>Ягодицы</span><strong>{{ format_delta((latest.glutes or 0) - (earliest.glutes or 0)) }}</strong></li>
+      <li class="soft-row"><span>Ноги</span><strong>{{ format_delta((latest.legs or 0) - (earliest.legs or 0)) }}</strong></li>
+    </ul>
+  </article>
+</section>
+{% endif %}
+{% endif %}
+
+<section class="list-grid">
+  {% for entry in entries %}
+  <article class="card measurement-entry-card">
+    <div class="card-head measurement-card-head">
+      <h3>{{ entry.entry_date.strftime("%d.%m.%Y") }}</h3>
+      <span class="measurement-weight-pill">{{ entry.weight or "—" }} кг</span>
+    </div>
+    <div class="metrics-grid small">
+      <div><span>Талия</span><strong>{{ entry.waist or "—" }}</strong></div>
+      <div><span>Грудь</span><strong>{{ entry.chest or "—" }}</strong></div>
+      <div><span>Бедра</span><strong>{{ entry.hips or "—" }}</strong></div>
+      <div><span>Ягодицы</span><strong>{{ entry.glutes or "—" }}</strong></div>
+      <div><span>Ноги</span><strong>{{ entry.legs or "—" }}</strong></div>
+    </div>
+    <div class="row-end measurement-actions-row">
+      <a class="btn secondary compact-btn" href="/measurements/{{ entry.id }}/edit">Редактировать</a>
+      <form method="post" action="/measurements/{{ entry.id }}/delete" onsubmit="return confirm('Удалить запись?')">
+        <button class="btn danger compact-btn" type="submit">Удалить</button>
+      </form>
+    </div>
+  </article>
+  {% else %}
+  <article class="card"><p class="muted">Записей пока нет. Первая запись создаст точку отсчета.</p></article>
+  {% endfor %}
+</section>
+{% endblock %}

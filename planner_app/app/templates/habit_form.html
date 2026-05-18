@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section-head">
+  <div>
+    <p class="eyebrow">привычка</p>
+    <h2>{{ "Редактировать привычку" if habit else "Новая привычка" }}</h2>
+  </div>
+</section>
+
+<form class="card form-card" method="post" action="{{ '/habits/' ~ habit.id ~ '/edit' if habit else '/habits' }}">
+  <div class="soft-box form-intro">
+    <strong>{{ "Измени привычку под свой ритм" if habit else "Создай привычку, которую реально хочется вести" }}</strong>
+    <p class="muted">Для воды, шагов или сна выбирай числовой тип. Для обычной отметки достаточно формата сделано / не сделано.</p>
+  </div>
+  <label>Название
+    <input type="text" name="title" value="{{ habit.title if habit else '' }}" required />
+  </label>
+  <div class="form-grid">
+    <label>Тип
+      <select name="habit_type">
+        <option value="boolean" {% if not habit or habit.habit_type == "boolean" %}selected{% endif %}>сделано / не сделано</option>
+        <option value="numeric" {% if habit and habit.habit_type == "numeric" %}selected{% endif %}>числовая</option>
+      </select>
+    </label>
+    <label>Частота
+      <select name="frequency">
+        {% for option in frequencies %}
+        <option value="{{ option }}" {% if habit and option == habit.frequency %}selected{% elif not habit and option == 'daily' %}selected{% endif %}>{{ frequency_labels.get(option, option) }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+  <label>Детали расписания
+    <input type="text" name="schedule_details" value="{{ habit.schedule_details if habit and habit.schedule_details else '' }}" placeholder="например: пн, ср, пт или каждые 3 дня" />
+  </label>
+  <div class="form-grid">
+    <label>Целевое значение
+      <input type="number" step="0.1" name="target_value" value="{{ habit.target_value if habit and habit.target_value is not none else '' }}" />
+    </label>
+    <label>Единица
+      <input type="text" name="unit" value="{{ habit.unit if habit and habit.unit else '' }}" placeholder="л, шагов, часов" />
+    </label>
+  </div>
+  <div class="row-end">
+    <a class="btn secondary" href="/habits">Отмена</a>
+    <button class="btn" type="submit">Сохранить</button>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title if title else "Личный планер" }}</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    {% set current_user = get_current_user(request) %}
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">LP</div>
+          <div>
+            <p class="eyebrow">личный планер</p>
+            <h1>Мой ритм</h1>
+          </div>
+        </div>
+        <nav class="nav">
+          <a href="/dashboard">Главная</a>
+          <a href="/calendar">Календарь</a>
+          <a href="/tasks">Задачи</a>
+          <a href="/goals">Цели</a>
+          <a href="/habits">Привычки</a>
+          <a href="/measurements">Вес и параметры</a>
+        </nav>
+        {% if current_user %}
+        <div class="sidebar-user">
+          <p class="muted">{{ current_user.email }}</p>
+          <a class="btn secondary" href="/logout">Выйти</a>
+        </div>
+        {% endif %}
+      </aside>
+      <main class="content">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+    <a class="quick-add" href="/tasks/new" aria-label="Быстро добавить задачу">+</a>
+    <nav class="mobile-nav">
+      <a href="/dashboard">Главная</a>
+      <a href="/calendar">Календарь</a>
+      <a href="/tasks">Задачи</a>
+      <a href="/goals">Цели</a>
+      <a href="/habits">Привычки</a>
+      <a href="/measurements">Вес</a>
+    </nav>
+  </body>
+  </html>

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section-head">
+  <div>
+    <p class="eyebrow">вес и параметры</p>
+    <h2>{{ "Редактировать запись" if entry else "Новая запись" }}</h2>
+  </div>
+</section>
+
+<form class="card form-card" method="post" action="{{ '/measurements/' ~ entry.id ~ '/edit' if entry else '/measurements' }}">
+  <div class="soft-box form-intro">
+    <strong>{{ "Обнови запись так, как тебе удобно" if entry else "Добавь новую запись без лишнего давления" }}</strong>
+    <p class="muted">Можно заполнять только те параметры, которые важны сейчас. Остальные оставить пустыми.</p>
+  </div>
+  <label>Дата
+    <input type="date" name="entry_date" value="{{ entry.entry_date.isoformat() if entry else default_date }}" required />
+  </label>
+  <div class="form-grid triple">
+    <label>Вес <input type="number" step="0.1" name="weight" value="{{ entry.weight if entry and entry.weight is not none else '' }}" /></label>
+    <label>Талия <input type="number" step="0.1" name="waist" value="{{ entry.waist if entry and entry.waist is not none else '' }}" /></label>
+    <label>Грудь <input type="number" step="0.1" name="chest" value="{{ entry.chest if entry and entry.chest is not none else '' }}" /></label>
+    <label>Бедра <input type="number" step="0.1" name="hips" value="{{ entry.hips if entry and entry.hips is not none else '' }}" /></label>
+    <label>Ягодицы <input type="number" step="0.1" name="glutes" value="{{ entry.glutes if entry and entry.glutes is not none else '' }}" /></label>
+    <label>Ноги <input type="number" step="0.1" name="legs" value="{{ entry.legs if entry and entry.legs is not none else '' }}" /></label>
+  </div>
+  <div class="row-end">
+    <a class="btn secondary" href="/measurements">Отмена</a>
+    <button class="btn" type="submit">Сохранить</button>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section-head">
+  <div>
+    <p class="eyebrow">привычки</p>
+    <h2>Трекер привычек</h2>
+  </div>
+  <a class="btn" href="/habits/new">Новая привычка</a>
+</section>
+
+<section class="list-grid">
+  {% for habit in habits %}
+  {% set log = today_log_map.get(habit.id) %}
+  {% set habit_stats = stats.get(habit.id, {'percent': 0, 'streak': 0}) %}
+  <article class="card">
+    <div class="card-head habit-card-head">
+      <div>
+        <h3>{{ habit.title }}</h3>
+        <p class="muted">
+          {{ "Числовая" if habit.habit_type == "numeric" else "Сделано / не сделано" }}
+          • {{ frequency_labels.get(habit.frequency, habit.frequency) }}
+          {% if habit.schedule_details %} • {{ habit.schedule_details }}{% endif %}
+        </p>
+      </div>
+      <div class="habit-head-side">
+        <span class="habit-stat-pill">{{ habit_stats.percent }}%</span>
+        <span class="habit-streak-pill">Серия: {{ habit_stats.streak }} дн.</span>
+      </div>
+    </div>
+    <form method="post" action="/habits/{{ habit.id }}/log" class="form-card compact-form">
+      <input type="hidden" name="log_date" value="{{ today.isoformat() }}" />
+      {% if habit.habit_type == "numeric" %}
+        <label>Значение за сегодня
+          <div class="inline-form habit-inline-form">
+            <input type="number" step="0.1" name="numeric_value" value="{{ log.numeric_value if log and log.numeric_value is not none else '' }}" />
+            <span class="unit">{{ habit.unit or "" }}</span>
+          </div>
+        </label>
+        <input type="hidden" name="completed" value="false" />
+      {% else %}
+        <label class="switch-row habit-switch-row">
+          <span>Отметить выполнение</span>
+          <select name="completed">
+            <option value="false" {% if not log or not log.completed %}selected{% endif %}>нет</option>
+            <option value="true" {% if log and log.completed %}selected{% endif %}>да</option>
+          </select>
+        </label>
+      {% endif %}
+      <button class="btn secondary compact-btn" type="submit">Сохранить</button>
+    </form>
+    <div class="row-end habit-actions-row">
+      <a class="btn secondary compact-btn" href="/habits/{{ habit.id }}/edit">Редактировать</a>
+      <form method="post" action="/habits/{{ habit.id }}/delete" onsubmit="return confirm('Удалить привычку?')">
+        <button class="btn danger compact-btn" type="submit">Удалить</button>
+      </form>
+    </div>
+  </article>
+  {% else %}
+  <article class="card"><p class="muted">Привычек пока нет. Можно начать с воды, шагов или сна.</p></article>
+  {% endfor %}
+</section>
+{% endblock %}
