@@ -107,7 +107,7 @@
               <form method="post" action="/dashboard/habits/{{ item.habit.id }}/status">
                 <input type="hidden" name="completed" value="{{ 'false' if item.log and item.log.completed else 'true' }}" />
                 <button class="tiny-btn {{ 'done-btn' if item.log and item.log.completed else '' }}" type="submit">
-                  {{ "Сделано" if not item.log or not item.log.completed else "Не сделано" }}
+                  {{ "Снять" if item.log and item.log.completed else "Отметить" }}
                 </button>
               </form>
             {% endif %}
@@ -223,7 +223,7 @@
       </div>
       {% if habits_today %}
         <ul class="mobile-habit-list">
-        {% for item in habits_today[:3] %}
+        {% for item in habits_today %}
           <li class="mobile-habit-item">
             <strong>{{ item.habit.title }}</strong>
             {% if item.habit.habit_type == "numeric" %}
@@ -244,7 +244,7 @@
               <form method="post" action="/dashboard/habits/{{ item.habit.id }}/status">
                 <input type="hidden" name="completed" value="{{ 'false' if item.log and item.log.completed else 'true' }}" />
                 <button class="tiny-btn {{ 'done-btn' if item.log and item.log.completed else '' }}" type="submit">
-                  {{ "Сделано" if not item.log or not item.log.completed else "Не сделано" }}
+                  {{ "Снять" if item.log and item.log.completed else "Отметить" }}
                 </button>
               </form>
             {% endif %}
