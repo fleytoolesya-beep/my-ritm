@@ -570,6 +570,10 @@ button, input, select, textarea {
   display: none;
 }
 
+.mobile-account-bar {
+  display: none;
+}
+
 .list-grid {
   display: grid;
   gap: 18px;
@@ -910,6 +914,37 @@ textarea {
     padding: 16px 16px 96px;
   }
 
+  .mobile-account-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 12px 14px;
+    border-radius: 20px;
+    background: rgba(255, 250, 245, 0.9);
+    border: 1px solid rgba(122, 104, 91, 0.1);
+    box-shadow: 0 12px 24px rgba(120, 79, 53, 0.08);
+  }
+
+  .mobile-account-text {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .mobile-account-text strong {
+    font-size: 14px;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+
+  .mobile-logout-btn {
+    flex-shrink: 0;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
   .calendar-day {
     min-height: 96px;
   }
@@ -1247,6 +1282,20 @@ textarea {
   .tiny-btn,
   .icon-btn {
     padding: 7px 9px;
+  }
+
+  .mobile-account-bar {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .mobile-account-text strong {
+    font-size: 13px;
+  }
+
+  .mobile-logout-btn {
+    padding: 7px 10px;
+    font-size: 12px;
   }
 
   .list-grid .card {
