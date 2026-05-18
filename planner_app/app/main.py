@@ -421,6 +421,7 @@ def habit_stats_from_logs(habits: list[SimpleNamespace], logs: list[SimpleNamesp
         logs_by_habit.setdefault(log.habit_id, []).append(log)
 
     stats = {}
+    today = date.today()
     for habit in habits:
         habit_logs = logs_by_habit.get(habit.id, [])
         total_days = len(habit_logs)
@@ -434,6 +435,15 @@ def habit_stats_from_logs(habits: list[SimpleNamespace], logs: list[SimpleNamesp
                 else:
                     break
         else:
+            today_log = next((log for log in habit_logs if log.log_date == today), None)
+            if (
+                today_log is not None
+                and today_log.numeric_value is not None
+                and habit.target_value not in (None, 0)
+            ):
+                percent = min(100, round((today_log.numeric_value / habit.target_value) * 100))
+            else:
+                percent = 0
             completed_days = sum(
                 1
                 for log in habit_logs
@@ -441,7 +451,6 @@ def habit_stats_from_logs(habits: list[SimpleNamespace], logs: list[SimpleNamesp
                 and habit.target_value is not None
                 and log.numeric_value >= habit.target_value
             )
-            percent = round((completed_days / total_days) * 100) if total_days else 0
             streak = 0
             for log in sorted(habit_logs, key=lambda item: item.log_date, reverse=True):
                 if (
