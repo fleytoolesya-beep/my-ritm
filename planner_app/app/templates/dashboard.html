@@ -38,20 +38,22 @@
         <ul class="check-list">
           {% for task in tasks_today %}
           <li>
-            <div>
-              <strong>{{ task.title }}</strong>
-              <p class="muted">{{ task.status }}{% if task.task_time %} • {{ task.task_time }}{% endif %}</p>
+            <div class="check-item-main">
+              <form class="check-item-form" method="post" action="/dashboard/tasks/{{ task.id }}/toggle">
+                <button
+                  class="completion-toggle {{ 'completed' if task.status == 'выполнено' else '' }}"
+                  type="submit"
+                  aria-label="{{ 'Снять выполнение задачи' if task.status == 'выполнено' else 'Отметить задачу выполненной' }}"
+                  title="{{ 'Снять выполнение' if task.status == 'выполнено' else 'Отметить выполненной' }}"
+                >
+                  <span>✓</span>
+                </button>
+              </form>
+              <div>
+                <strong>{{ task.title }}</strong>
+                <p class="muted">{{ task.status }}{% if task.task_time %} • {{ task.task_time }}{% endif %}</p>
+              </div>
             </div>
-            <form method="post" action="/dashboard/tasks/{{ task.id }}/toggle">
-              <button
-                class="completion-toggle {{ 'completed' if task.status == 'выполнено' else '' }}"
-                type="submit"
-                aria-label="{{ 'Снять выполнение задачи' if task.status == 'выполнено' else 'Отметить задачу выполненной' }}"
-                title="{{ 'Снять выполнение' if task.status == 'выполнено' else 'Отметить выполненной' }}"
-              >
-                <span>✓</span>
-              </button>
-            </form>
           </li>
           {% endfor %}
         </ul>
@@ -82,34 +84,31 @@
         <ul class="check-list">
         {% for item in habits_today %}
           <li>
+            {% if item.habit.habit_type == "numeric" %}
             <div>
               <strong>{{ item.habit.title }}</strong>
               <p class="muted">{{ item.frequency_label }}</p>
-              {% if item.habit.habit_type == "numeric" %}
-                <p class="muted">
-                  {% if item.log and item.log.numeric_value is not none %}
-                    {{ item.log.numeric_value }} / {{ item.habit.target_value or "—" }} {{ item.habit.unit or "" }}
-                  {% else %}
-                    0 / {{ item.habit.target_value or "—" }} {{ item.habit.unit or "" }}
-                  {% endif %}
-                </p>
-              {% else %}
-                <p class="muted">{{ "сделано" if item.log and item.log.completed else "не сделано" }}</p>
-              {% endif %}
+              <p class="muted">
+                {% if item.log and item.log.numeric_value is not none %}
+                  {{ item.log.numeric_value }} / {{ item.habit.target_value or "—" }} {{ item.habit.unit or "" }}
+                {% else %}
+                  0 / {{ item.habit.target_value or "—" }} {{ item.habit.unit or "" }}
+                {% endif %}
+              </p>
             </div>
-            {% if item.habit.habit_type == "numeric" %}
-              <div class="dashboard-habit-actions">
-                <form method="post" action="/dashboard/habits/{{ item.habit.id }}/increment">
-                  <input type="hidden" name="delta" value="-1" />
-                  <button class="icon-btn" type="submit">−</button>
-                </form>
-                <form method="post" action="/dashboard/habits/{{ item.habit.id }}/increment">
-                  <input type="hidden" name="delta" value="1" />
-                  <button class="tiny-btn" type="submit">+1</button>
-                </form>
-              </div>
+            <div class="dashboard-habit-actions">
+              <form method="post" action="/dashboard/habits/{{ item.habit.id }}/increment">
+                <input type="hidden" name="delta" value="-1" />
+                <button class="icon-btn" type="submit">−</button>
+              </form>
+              <form method="post" action="/dashboard/habits/{{ item.habit.id }}/increment">
+                <input type="hidden" name="delta" value="1" />
+                <button class="tiny-btn" type="submit">+1</button>
+              </form>
+            </div>
             {% else %}
-              <form method="post" action="/dashboard/habits/{{ item.habit.id }}/status">
+            <div class="check-item-main">
+              <form class="check-item-form" method="post" action="/dashboard/habits/{{ item.habit.id }}/status">
                 <input type="hidden" name="completed" value="{{ 'false' if item.log and item.log.completed else 'true' }}" />
                 <button
                   class="completion-toggle {{ 'completed' if item.log and item.log.completed else '' }}"
@@ -120,6 +119,12 @@
                   <span>✓</span>
                 </button>
               </form>
+              <div>
+                <strong>{{ item.habit.title }}</strong>
+                <p class="muted">{{ item.frequency_label }}</p>
+                <p class="muted">{{ "сделано" if item.log and item.log.completed else "не сделано" }}</p>
+              </div>
+            </div>
             {% endif %}
           </li>
         {% endfor %}
@@ -209,20 +214,22 @@
         <ul class="mobile-list">
           {% for task in tasks_today[:4] %}
           <li class="mobile-list-item">
-            <div>
-              <strong>{{ task.title }}</strong>
-              <p class="muted">{{ task.status }}</p>
+            <div class="check-item-main">
+              <form class="check-item-form" method="post" action="/dashboard/tasks/{{ task.id }}/toggle">
+                <button
+                  class="completion-toggle {{ 'completed' if task.status == 'выполнено' else '' }}"
+                  type="submit"
+                  aria-label="{{ 'Снять выполнение задачи' if task.status == 'выполнено' else 'Отметить задачу выполненной' }}"
+                  title="{{ 'Снять выполнение' if task.status == 'выполнено' else 'Отметить выполненной' }}"
+                >
+                  <span>✓</span>
+                </button>
+              </form>
+              <div>
+                <strong>{{ task.title }}</strong>
+                <p class="muted">{{ task.status }}</p>
+              </div>
             </div>
-            <form method="post" action="/dashboard/tasks/{{ task.id }}/toggle">
-              <button
-                class="completion-toggle {{ 'completed' if task.status == 'выполнено' else '' }}"
-                type="submit"
-                aria-label="{{ 'Снять выполнение задачи' if task.status == 'выполнено' else 'Отметить задачу выполненной' }}"
-                title="{{ 'Снять выполнение' if task.status == 'выполнено' else 'Отметить выполненной' }}"
-              >
-                <span>✓</span>
-              </button>
-            </form>
           </li>
           {% endfor %}
         </ul>
@@ -240,33 +247,40 @@
         <ul class="mobile-habit-list">
         {% for item in habits_today %}
           <li class="mobile-habit-item">
-            <strong>{{ item.habit.title }}</strong>
             {% if item.habit.habit_type == "numeric" %}
-              <p class="muted mobile-habit-value">
-                {{ item.log.numeric_value if item.log and item.log.numeric_value is not none else 0 }} / {{ item.habit.target_value or "—" }}
-              </p>
-              <div class="dashboard-habit-actions compact-actions">
-                <form method="post" action="/dashboard/habits/{{ item.habit.id }}/increment">
-                  <input type="hidden" name="delta" value="-1" />
-                  <button class="icon-btn" type="submit">−</button>
-                </form>
-                <form method="post" action="/dashboard/habits/{{ item.habit.id }}/increment">
-                  <input type="hidden" name="delta" value="1" />
-                  <button class="tiny-btn" type="submit">+1</button>
-                </form>
-              </div>
-            {% else %}
-              <form method="post" action="/dashboard/habits/{{ item.habit.id }}/status">
-                <input type="hidden" name="completed" value="{{ 'false' if item.log and item.log.completed else 'true' }}" />
-                <button
-                  class="completion-toggle {{ 'completed' if item.log and item.log.completed else '' }}"
-                  type="submit"
-                  aria-label="{{ 'Снять выполнение привычки' if item.log and item.log.completed else 'Отметить привычку выполненной' }}"
-                  title="{{ 'Снять выполнение' if item.log and item.log.completed else 'Отметить выполненной' }}"
-                >
-                  <span>✓</span>
-                </button>
+            <strong>{{ item.habit.title }}</strong>
+            <p class="muted mobile-habit-value">
+              {{ item.log.numeric_value if item.log and item.log.numeric_value is not none else 0 }} / {{ item.habit.target_value or "—" }}
+            </p>
+            <div class="dashboard-habit-actions compact-actions">
+              <form method="post" action="/dashboard/habits/{{ item.habit.id }}/increment">
+                <input type="hidden" name="delta" value="-1" />
+                <button class="icon-btn" type="submit">−</button>
               </form>
+              <form method="post" action="/dashboard/habits/{{ item.habit.id }}/increment">
+                <input type="hidden" name="delta" value="1" />
+                <button class="tiny-btn" type="submit">+1</button>
+              </form>
+            </div>
+            {% else %}
+            <div class="check-item-main">
+              <form class="check-item-form" method="post" action="/dashboard/habits/{{ item.habit.id }}/status">
+                <input type="hidden" name="completed" value="{{ 'false' if item.log and item.log.completed else 'true' }}" />
+              <button
+                class="completion-toggle {{ 'completed' if item.log and item.log.completed else '' }}"
+                type="submit"
+                aria-label="{{ 'Снять выполнение привычки' if item.log and item.log.completed else 'Отметить привычку выполненной' }}"
+                title="{{ 'Снять выполнение' if item.log and item.log.completed else 'Отметить выполненной' }}"
+              >
+                <span>✓</span>
+              </button>
+              </form>
+              <div>
+                <strong>{{ item.habit.title }}</strong>
+                <p class="muted">{{ item.frequency_label }}</p>
+                <p class="muted">{{ "сделано" if item.log and item.log.completed else "не сделано" }}</p>
+              </div>
+            </div>
             {% endif %}
           </li>
         {% endfor %}
