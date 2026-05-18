@@ -530,6 +530,7 @@ def dashboard_context(request: Request) -> dict:
     logs_by_habit = {log.habit_id: log for log in logs}
     completed_tasks = sum(1 for task in tasks_today if task.status == "выполнено")
     progress = round((completed_tasks / len(tasks_today)) * 100) if tasks_today else 0
+    pending_tasks = [task for task in tasks_today if task.status != "выполнено"]
     focus_task = next((task for task in tasks_today if task.status != "выполнено"), None)
 
     habits_today = []
@@ -563,6 +564,7 @@ def dashboard_context(request: Request) -> dict:
     return {
         "today": today,
         "tasks_today": tasks_today,
+        "pending_tasks": pending_tasks,
         "goal_summaries": goal_summaries,
         "habits_today": habits_today,
         "progress": progress,

@@ -34,9 +34,9 @@
         <h3>План на сегодня</h3>
         <a class="link" href="/tasks/new">+ задача</a>
       </div>
-      {% if tasks_today %}
+      {% if pending_tasks %}
         <ul class="check-list">
-          {% for task in tasks_today %}
+          {% for task in pending_tasks %}
           <li>
             <div class="check-item-main">
               <form class="check-item-form" method="post" action="/dashboard/tasks/{{ task.id }}/toggle">
@@ -60,7 +60,7 @@
           {% endfor %}
         </ul>
       {% else %}
-        <p class="muted">На сегодня задач пока нет.</p>
+        <p class="muted">На сегодня активных задач не осталось.</p>
       {% endif %}
     </article>
 
@@ -209,9 +209,9 @@
         <h3>Задачи на день</h3>
         <a class="link" href="/tasks">все</a>
       </div>
-      {% if tasks_today %}
+      {% if pending_tasks %}
         <ul class="mobile-list">
-          {% for task in tasks_today[:4] %}
+          {% for task in pending_tasks[:4] %}
           <li class="mobile-list-item">
             <div class="check-item-main">
               <form class="check-item-form" method="post" action="/dashboard/tasks/{{ task.id }}/toggle">
@@ -235,7 +235,7 @@
           {% endfor %}
         </ul>
       {% else %}
-        <p class="muted">Задач на сегодня пока нет.</p>
+        <p class="muted">На сегодня активных задач не осталось.</p>
       {% endif %}
     </article>
 
