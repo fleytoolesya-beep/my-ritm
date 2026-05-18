@@ -51,7 +51,9 @@
               </form>
               <div>
                 <strong>{{ task.title }}</strong>
-                <p class="muted">{{ task.status }}{% if task.task_time %} • {{ task.task_time }}{% endif %}</p>
+                {% if task.task_time %}
+                <p class="muted">{{ task.task_time }}</p>
+                {% endif %}
               </div>
             </div>
           </li>
@@ -121,8 +123,6 @@
               </form>
               <div>
                 <strong>{{ item.habit.title }}</strong>
-                <p class="muted">{{ item.frequency_label }}</p>
-                <p class="muted">{{ "сделано" if item.log and item.log.completed else "не сделано" }}</p>
               </div>
             </div>
             {% endif %}
@@ -227,7 +227,9 @@
               </form>
               <div>
                 <strong>{{ task.title }}</strong>
-                <p class="muted">{{ task.status }}</p>
+                {% if task.task_time %}
+                <p class="muted">{{ task.task_time }}</p>
+                {% endif %}
               </div>
             </div>
           </li>
@@ -277,8 +279,6 @@
               </form>
               <div>
                 <strong>{{ item.habit.title }}</strong>
-                <p class="muted">{{ item.frequency_label }}</p>
-                <p class="muted">{{ "сделано" if item.log and item.log.completed else "не сделано" }}</p>
               </div>
             </div>
             {% endif %}
