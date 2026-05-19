@@ -225,9 +225,8 @@ def get_authenticated_supabase(request: Request):
     if client is None:
         return None
     access_token = user.get("access_token")
-    refresh_token = user.get("refresh_token")
-    if access_token and refresh_token:
-        client.auth.set_session(access_token, refresh_token)
+    if access_token:
+        client.postgrest.auth(access_token)
     return client
 
 
